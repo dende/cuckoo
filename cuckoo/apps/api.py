@@ -232,6 +232,10 @@ def tasks_list(limit=None, offset=None):
     for row in tasks:
         task = row.to_dict(dt=True)
 
+        # Sanitize the target in case it contains non-ASCII characters as we
+        # can't pass along an encoding to flask's jsonify().
+        task["target"] = task["target"].decode("latin-1")
+
         task["guest"] = {}
         if row.guest:
             task["guest"] = row.guest.to_dict()
@@ -326,6 +330,7 @@ def tasks_report(task_id, report_format="json"):
     formats = {
         "json": "report.json",
         "html": "report.html",
+        "maec": "report.MAEC-5.0.json",
     }
 
     bz_formats = {
@@ -374,7 +379,7 @@ def tasks_report(task_id, report_format="json"):
     if not os.path.exists(report_path):
         return json_error(404, "Report not found")
 
-    if report_format == "json":
+    if report_format == "json" or report_format == "maec":
         response = make_response(open(report_path, "rb").read())
         response.headers["Content-Type"] = "application/json"
         return response
