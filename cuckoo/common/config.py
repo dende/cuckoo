@@ -712,6 +712,9 @@ class Config(object):
             "__star__": ("qemu", "machines"),
         },
         "reporting": {
+            "maecreport" : {
+                "enabled": Boolean(False)
+            },
             "feedback": {
                 "enabled": Boolean(False),
             },
